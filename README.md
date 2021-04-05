@@ -12,13 +12,13 @@ when there are no more ** next.
 
 
 Compilation instructions:
-$ make compile --directory=part1
+$ make compile
 
 Execution instructions:
-$ make execute --directory=part1
+$ make execute
 
 To clean up generated files:
-$ make clean --directory=part1
+$ make clean
 
 
 Grammar:
@@ -53,12 +53,12 @@ digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 Part 2
 
 Compilation instructions:
-$ make compile --directory=part2
+$ make compile
 
 Execution instructions:
-$ make execute --directory=part2
+$ make execute
 
 To cleanup generated files:
-$ make clean --directory=part2
+$ make clean
 
 
