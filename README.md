@@ -23,10 +23,10 @@ $ make clean
 
 Grammar:
 
-exp -> term exp2
+expr -> term expr2
 
-exp2 -> + term exp2
-        | - term exp2
+expr2 -> + term expr2
+        | - term expr2
         | ε
 
 term -> factor term2
@@ -35,7 +35,7 @@ term2 -> ** factor term2
         | ε
 
 factor -> num 
-        | (exp)
+        | (expr)
 
 op -> +
     | -
