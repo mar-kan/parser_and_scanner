@@ -86,14 +86,14 @@ funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr:e RBRACKET    {:
                 :}
              ;
 
+argu_list  ::= argu:a                        {: RESULT = String.format("%s", a);                 :} //single
+              | argu_list:rest COMMA argu:a  {: RESULT = String.format("%s, %s", rest, a);       :} //multiple
+              |                              {: RESULT = "";                                     :} //none
+             ;
+
 argu       ::= ID:id                         {: RESULT = String.format("%s", id);                :}
               | STRING_LITERAL:s             {: RESULT = String.format("%s", s);                 :}
              ;
-
-argu_list  ::= argu_list:rest argu:a         {: RESULT = String.format("%s %s,", rest, a);       :}
-              |                              {: RESULT = "";                                     :}
-             ;
-
 
 /**
 op         ::= CONCAT
