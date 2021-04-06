@@ -85,6 +85,7 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
   "{"           { return symbol(sym.LBRACKET); }
   "}"           { return symbol(sym.RBRACKET); }
   "return"      { return symbol(sym.RETURN);   }
+  ","           { return symbol(sym.COMMA);    }
 
  //for variables. returns their name
  {id} 		    { return symbol(sym.ID, new String(yytext())); }

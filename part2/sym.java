@@ -7,14 +7,15 @@
 public interface sym {
   /* terminals */
   public static final int SEMI = 2;
-  public static final int STRING_LITERAL = 13;
+  public static final int STRING_LITERAL = 14;
   public static final int EOF = 0;
   public static final int PREFIX = 4;
   public static final int CONCAT = 3;
   public static final int IF = 6;
   public static final int RBRACKET = 11;
-  public static final int ID = 14;
+  public static final int ID = 15;
   public static final int ELSE = 7;
+  public static final int COMMA = 13;
   public static final int error = 1;
   public static final int RPAREN = 9;
   public static final int RETURN = 12;
@@ -35,6 +36,7 @@ public interface sym {
   "LBRACKET",
   "RBRACKET",
   "RETURN",
+  "COMMA",
   "STRING_LITERAL",
   "ID"
   };
