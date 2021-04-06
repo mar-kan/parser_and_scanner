@@ -47,7 +47,7 @@ precedence left IF;
 //program starts with declaration of functions and then the main function from the user, but prints them backwards
 start_prog ::= funct_decl:f main_prog:main   {:
                   print("\n\npublic class Main {");
-                  print(String.format("\t%s\n\t%s\n", main, f));
+                  print(String.format("\t%s\n\t%s\n}", main, f));
                   :}
              ;
 
@@ -58,7 +58,7 @@ funct_list ::= funct_list:rest funct_decl:d  {: RESULT = String.format("%s\n\t%s
 
 //main function
 main_prog  ::= expr_list:e {:
-			    RESULT = String.format("public static void main(String[] args) {\n%s\t\n}\n", e);
+			    RESULT = String.format("public static void main(String[] args) {\n%s\t\n\t}\n", e);
 			    :}
 	         ;
 
@@ -82,8 +82,8 @@ if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
                       {: RESULT = String.format("if (%s)\n\t\t\t%s;\n\t\t else\n\t\t\t%s", le, e1, e2);:}
              ;
 
-funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr:e RBRACKET    {:
-                RESULT = String.format("public static String %s(%s) {\n\t\t%s\n\t}\n}", id, args, e);
+funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
+                RESULT = String.format("public static String %s(%s) {\n%s\n\t}", id, args, e);
                 :}
               |                                         {: RESULT = String.format(""); :}
              ;
