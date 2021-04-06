@@ -59,28 +59,37 @@ LineTerminator = \r|\n|\r\n
 /* White space is a line terminator, space, tab, or line feed. */
 WhiteSpace     = {LineTerminator} | [ \t\f]
 
-id = [a-zA-Z_][a-zA-Z0-9_]*
+id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
 
 
 
-%state STRING, IDENTIFIER
+%state STRING
 
 %%
 /* ------------------------Lexical Rules Section---------------------- */
 
 <YYINITIAL> {
 /* operators */
- "+"            { return symbol(sym.CONCAT); }
+ "+"            { return symbol(sym.CONCAT); } //changed PLUS to CONCAT
  "("            { return symbol(sym.LPAREN); }
  ")"            { return symbol(sym.RPAREN); }
  ";"            { return symbol(sym.SEMI); }
- "prefix"       { return symbol(sym.PREFIX); }
- "suffix"       { return symbol(sym.SUFFIX); }
- "if"           { return symbol(sym.IF); }
- "else"         { return symbol(sym.ELSE); }
  \"             { stringBuffer.setLength(0); yybegin(STRING); }
- {id} 		    { return symbol(sym.ID , new String (yytext()) ); }
  {WhiteSpace}   { /* just skip what was found, do nothing */ }
+
+  /** added operators**/
+ "prefix"       { return symbol(sym.PREFIX);   }
+ "suffix"       { return symbol(sym.SUFFIX);   }
+ "if"           { return symbol(sym.IF);       }
+ "else"         { return symbol(sym.ELSE);     }
+  "{"           { return symbol(sym.LBRACKET); }
+  "}"           { return symbol(sym.RBRACKET); }
+  "return"      { return symbol(sym.RETURN);   }
+
+ //for variables. returns their name
+ {id} 		    { return symbol(sym.ID, new String(yytext())); }
+
+ /****/
 }
 
 
