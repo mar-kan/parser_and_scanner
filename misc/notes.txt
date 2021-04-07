@@ -1,0 +1,135 @@
+part1
+
+parser.cup:
+
+you specify the symbols of your grammar (terminal T1,T2; non terminal N1, N2;),
+as well as the productions (LHS :== RHS1 | RHS2 ;).
+If you provide each production alternative with action code
+({: RESULT = myfunction(); :})
+the parser will call this action code after performing a reduction with the
+particular production.
+
+A CUP specification consists of:
+
+    package and import specifications
+    parser class name
+    user code components
+    symbol (terminal and non-terminal) lists
+    precedence declarations
+    the grammar
+
+
+
+part2
+
+scanner.flex:
+
+UserCode
+
+The first part contains user code that is copied verbatim into the beginning of the source file of the
+generated lexer before the scanner class is declared. This is the place to put package declarations
+and import statements.
+
+
+%%
+
+Options and declarations
+
+The second part of the lexical specification contains options to customise your generated lexer,
+declarations of lexical states and macro definitions for use in the third section ``Lexical rules'' of the
+lexical specification file.
+
+
+%%
+
+Lexical rules
+
+The ``lexical rules'' section of a JFlex specification contains a set of regular expressions and actions
+(Java code) that are executed when the scanner matches the associated regular expression.
+
+
+
+***********************************************************************************
+
+
+
+Part 2
+
+CHECK    function definitions \
+            and calls
+
+         conditionals (if-else i.e, every "if" must be followed by an "else"),
+
+***
+
+CHECK    language supports the concatenation (+) operator over strings,
+CHECK    and the following logical expressions:
+CHECK    is-prefix-of (string1 prefix string2): Whether string1 is a prefix of string2.
+CHECK    is-suffix-of (string1 suffix string2): Whether string1 is a suffix of string2.
+
+
+in:
+
+    name()  {
+        "John";
+    }
+    surname(x) {
+        "Doe";
+    }
+
+    fullname(first_name, sep, last_name) {
+        first_name + sep + last_name;
+        "John" prefix "Doe";
+        x+x+x;
+    }
+
+    name();
+    surname();
+    fullname(name(), " ", surname());
+
+
+
+out: public class Main {
+         public static void main(String[] args) {
+             System.out.println(name());
+             System.out.println(surname());
+             System.out.println(fullname(name(), " ", surname()));
+         }
+
+         public static String name(x) {
+             return "John";
+         }
+
+         public static String surname() {
+             return "Doe";
+         }
+
+         public static String fullname(String first_name, String sep, String last_name) {
+             return first_name + sep + last_name;
+         }
+     }
+
+
+     ***
+
+
+     cond_repeat(c, x) {
+         if (c prefix "yes")
+             if("yes" prefix c)
+                 repeat(x);
+             else
+                 x;
+         else
+             x;
+     }
+
+public static String name(x) {
+                  return "John";
+              }
+         if (c prefix "yes")
+             if("yes" prefix "c")
+                 repeat(x)
+             else
+                 x
+         else
+             x;
