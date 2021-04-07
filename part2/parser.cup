@@ -31,7 +31,7 @@ terminal String     STRING_LITERAL, ID;
 /*  Non terminals */
 non terminal            start_prog;
 non terminal String     expr, expr_list, logic_expr, if_expr, funct_decl, value, main_prog;
-non terminal String     funct_list, argu_list, funct_call;      // used to store evaluated subexpressions
+non terminal String     funct_list, argu_list, funct_call, return_expr;      // used to store evaluated subexpressions
 
 /**
  *  Precedence Declarations
@@ -67,7 +67,7 @@ expr_list  ::= expr_list:rest expr:e SEMI    {: RESULT = String.format("%s\t\t%s
              ;
 
 expr       ::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2);       :}
-              | logic_expr:le                {: RESULT = String.format("%s", le);                :}
+              | logic_expr:le                {: RESULT = String.format("System.out.println(%s)",le);   :}
               | if_expr:ie                   {: RESULT = String.format("%s", ie);                :}
               | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e);               :}
               | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
@@ -82,15 +82,21 @@ if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
                       {: RESULT = String.format("if (%s)\n\t\t\t%s;\n\t\t else\n\t\t\t%s", le, e1, e2);:}
              ;
 
-funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
+funct_decl ::= /*ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
                 RESULT = String.format("public static String %s(%s) {\n%s\n\t}", id, args, e);
                 :}
-              |                                         {: RESULT = String.format(""); :}
+              |*/                              {: RESULT = String.format("");                      :}
              ;
 
 funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
                 RESULT = String.format("System.out.println(%s(%s))", id, args);
                 :}
+             ;
+
+return_expr::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2);       :}
+              | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e);               :}
+              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
+              | value:v                      {: RESULT = String.format("%s", v);                 :}
              ;
 
 argu_list  ::= value:v                       {: RESULT = String.format("%s", v);                 :} //single
