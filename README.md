@@ -41,13 +41,14 @@ op -> +
     | -
     | **
 
-num -> digit moreDigits
+num -> first_digit moreDigits
 
 moreDigits -> num
             | ε
 
 digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
+first_digit -> 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 
 Part 2
