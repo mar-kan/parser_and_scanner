@@ -35,9 +35,24 @@ class CalculatorEvaluator {
         else if (sign == '-')
             return num - num2;
         else if (sign == '*')
-            return (int)Math.pow(num, num2);
+            return pow(num, num2);
         else
             throw new ParseError("calculateResult");
+    }
+
+    private static int pow(int base, int exponent) //piazza function for power
+    {
+        if (exponent < 0)
+            return 0;
+        if (exponent == 0)
+            return 1;
+        if (exponent == 1)
+            return base;
+
+        if (exponent % 2 == 0) //even exp -> b ^ exp = (b^2)^(exp/2)
+            return pow(base * base, exponent/2);
+        else                   //odd exp -> b ^ exp = b * (b^2)^(exp/2)
+            return base * pow(base * base, exponent/2);
     }
     
 
@@ -136,7 +151,7 @@ class CalculatorEvaluator {
     
     private int num() throws IOException, ParseError
     {
-        int num = digit();
+        int num = first_digit();
         return moreDigits(num);
     }
     
@@ -156,6 +171,18 @@ class CalculatorEvaluator {
     {
         if (lookaheadToken < '0' || lookaheadToken > '9')
             throw new ParseError("digit");
+
+        int num = lookaheadToken;
+        consume(num);
+
+        return evalDigit(num);  //returns its int value
+    }
+
+    //1st digit of int. to throw parse error when a num starts with 0
+    private int first_digit() throws IOException, ParseError
+    {
+        if (lookaheadToken <= '0' || lookaheadToken > '9')
+            throw new ParseError("start_num");
 
         int num = lookaheadToken;
         consume(num);

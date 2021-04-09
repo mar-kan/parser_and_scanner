@@ -82,10 +82,10 @@ if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
                       {: RESULT = String.format("if (%s)\n\t\t\t%s;\n\t\t else\n\t\t\t%s", le, e1, e2);:}
              ;
 
-funct_decl ::= /*ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
+funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
                 RESULT = String.format("public static String %s(%s) {\n%s\n\t}", id, args, e);
                 :}
-              |*/                              {: RESULT = String.format("");                      :}
+              |                              {: RESULT = String.format("");                      :}
              ;
 
 funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
