@@ -30,8 +30,8 @@ terminal String     STRING_LITERAL, ID;
 
 /*  Non terminals */
 non terminal            start_prog;
-non terminal String     expr, expr_list, logic_expr, if_expr, funct_decl, value, main_prog;
-non terminal String     funct_list, argu_list, funct_call, return_expr;      // used to store evaluated subexpressions
+non terminal String     expr, expr_list, logic_expr, if_expr, funct_decl, plain_expr, main_prog;
+non terminal String     funct_list, argu_list, funct_call;      // used to store evaluated subexpressions
 
 /**
  *  Precedence Declarations
@@ -45,15 +45,15 @@ precedence left IF;
  */
 
 //program starts with declaration of functions and then the main function from the user, but prints them backwards
-start_prog ::= funct_decl:f main_prog:main   {:
+start_prog ::= funct_list:f main_prog:main   {:
                   print("\n\npublic class Main {");
                   print(String.format("\t%s\n\t%s\n}", main, f));
                   :}
              ;
 
 //for declaration of functions only
-funct_list ::= funct_list:rest funct_decl:d  {: RESULT = String.format("%s\n\t%s\n", rest, d);   :}
-              |                              {: RESULT = "";                                     :}
+funct_list ::= /*funct_list:rest funct_decl:d  {: RESULT = String.format("%s\n\t%s\n", rest, d);   :}
+              |*/                              {: RESULT = "";                                     :}
              ;
 
 //main function
@@ -66,26 +66,23 @@ expr_list  ::= expr_list:rest expr:e SEMI    {: RESULT = String.format("%s\t\t%s
               |                              {: RESULT = "";                                     :}
              ;
 
-expr       ::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2);       :}
-              | logic_expr:le                {: RESULT = String.format("System.out.println(%s)",le);   :}
+expr       ::= logic_expr:le                 {: RESULT = String.format("System.out.println(%s)",le);   :}
               | if_expr:ie                   {: RESULT = String.format("%s", ie);                :}
               | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e);               :}
-              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
-              | value:v                      {: RESULT = String.format("%s", v);                 :}
+              | plain_expr:pe                {: RESULT = String.format("%s", pe);                :}
              ;
 
-logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("%s.is-prefix-of(%s)", e1, e2); :}
-              | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.is-suffix-of(%s)", e1, e2); :}
+logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("%s.isPrefixOf(%s)", e1, e2); :}
+              | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.isSuffixOf(%s)", e1, e2); :}
              ;
 
-if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
+if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 SEMI ELSE expr:e2
                       {: RESULT = String.format("if (%s)\n\t\t\t%s;\n\t\t else\n\t\t\t%s", le, e1, e2);:}
              ;
 
 funct_decl ::= ID:id LPAREN argu_list:args RPAREN LBRACKET expr_list:e RBRACKET    {:
                 RESULT = String.format("public static String %s(%s) {\n%s\n\t}", id, args, e);
                 :}
-              |                              {: RESULT = String.format("");                      :}
              ;
 
 funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
@@ -93,19 +90,16 @@ funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
                 :}
              ;
 
-return_expr::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2);       :}
-              | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e);               :}
-              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
-              | value:v                      {: RESULT = String.format("%s", v);                 :}
-             ;
-
-argu_list  ::= value:v                       {: RESULT = String.format("%s", v);                 :} //single
-              | argu_list:rest COMMA value:v {: RESULT = String.format("%s, %s", rest, v);       :} //multiple
+argu_list  ::= plain_expr:pe                 {: RESULT = String.format("%s", pe);                :} //single
+              | argu_list:rest COMMA plain_expr:pe {: RESULT = String.format("%s, %s", rest, pe);:} //multiple
+              | expr:e1 CONCAT  expr:e2      {: RESULT = String.format("%s + %s", e1, e2);       :}
               |                              {: RESULT = "";                                     :} //none
              ;
 
-value       ::= ID:id                        {: RESULT = String.format("%s", id);                :}
+plain_expr ::= ID:id                        {: RESULT = String.format("%s", id);                :}
               | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s);             :}
+              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
+
              ;
 
 /**

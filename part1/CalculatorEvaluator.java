@@ -182,7 +182,7 @@ class CalculatorEvaluator {
     private int first_digit() throws IOException, ParseError
     {
         if (lookaheadToken <= '0' || lookaheadToken > '9')
-            throw new ParseError("start_num");
+            throw new ParseError("first_digit");
 
         int num = lookaheadToken;
         consume(num);

@@ -87,10 +87,12 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
   "return"      { return symbol(sym.RETURN);   }
   ","           { return symbol(sym.COMMA);    }
 
+ //for function calls
+ //{id}"("        { stringBuffer.setLength(0); yybegin(CALL_FUNCT); }
+
  //for variables. returns their name
  {id} 		    { return symbol(sym.ID, new String(yytext())); }
 
-// {id}"("        { stringBuffer.setLength(0); yybegin(FUNCTION); }
  /****/
 }
 
@@ -107,25 +109,13 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
       \\                             { stringBuffer.append('\\'); }
 }
 
-/**
-<FUNCTION> {
-    \}                               { yybegin(YYINITIAL);
-                                       return symbol("iuhieurhgieuhr ", stringBuffer.toString()); }
-    [^\n\r\"\\]+                   { stringBuffer.append( yytext() ); }
-}
 
 <DECLARE_FUNCT> {
-    \}                               { yybegin(YYINITIAL);
-                                       return symbol("iuhieurhgieuhr ", stringBuffer.toString()); }
-    [^\n\r\"\\]+                   { stringBuffer.append( yytext() ); }
+    \)                               { yybegin(YYINITIAL);
+                                           return symbol(sym.ID, stringBuffer.toString()); }
+    [^\n\0\r\"\\\(]+                 { stringBuffer.append( yytext() ); }
 }
 
-<CALL_FUNCT> {
-    \}                               { yybegin(YYINITIAL);
-                                           return symbol("iuhieurhgieuhr ", stringBuffer.toString()); }
-    [^\n\r\"\\]+                   { stringBuffer.append( yytext() ); }
-}
-**/
 
 /* No token was found for the input so throw an error.  Print out an
    Illegal character message with the illegal character that was found. */

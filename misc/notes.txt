@@ -56,18 +56,19 @@ The ``lexical rules'' section of a JFlex specification contains a set of regular
 Part 2
 
 CHECK    function definitions \
-            and calls
-
-         conditionals (if-else i.e, every "if" must be followed by an "else"),
-
-***
-
+CHECK            and calls
+CHECK    conditionals (if-else i.e, every "if" must be followed by an "else"),
 CHECK    language supports the concatenation (+) operator over strings,
 CHECK    and the following logical expressions:
 CHECK    is-prefix-of (string1 prefix string2): Whether string1 is a prefix of string2.
 CHECK    is-suffix-of (string1 suffix string2): Whether string1 is a suffix of string2.
 
+***
+    funct def and calls simoulteneously
+    notebook notes
 
+
+****
 in:
 
     name()  {
@@ -85,7 +86,9 @@ in:
 
     name();
     surname();
-    fullname(name(), " ", surname());
+    fullname(first_name, sep, last_name);
+
+
 
 
 
@@ -133,3 +136,8 @@ public static String name(x) {
                  x
          else
              x;
+
+
+
+TODO:           fullname(name(), " ", surname());
+ if (a+b+"a"+"b" prefix p prefix y) a; else b;
