@@ -92,13 +92,13 @@ funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
 
 argu_list  ::= plain_expr:pe                 {: RESULT = String.format("%s", pe);                :} //single
               | argu_list:rest COMMA plain_expr:pe {: RESULT = String.format("%s, %s", rest, pe);:} //multiple
-              | expr:e1 CONCAT  expr:e2      {: RESULT = String.format("%s + %s", e1, e2);       :}
               |                              {: RESULT = "";                                     :} //none
              ;
 
 plain_expr ::= ID:id                         {: RESULT = String.format("%s", id);                :}
               | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s);             :}
               | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
+              | expr:e1 CONCAT  expr:e2      {: RESULT = String.format("%s + %s", e1, e2);       :}
 
              ;
 
