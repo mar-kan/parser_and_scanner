@@ -153,8 +153,7 @@ class CalculatorEvaluator {
     
     private int num() throws IOException, ParseError
     {
-        int num = first_digit();
-        return moreDigits(num);
+        return moreDigits(first_digit());
     }
     
     private int moreDigits(int num) throws IOException, ParseError {

@@ -87,6 +87,7 @@ in:
     name();
     surname();
     fullname(first_name, sep, last_name);
+    fullname(name(), " ", surname());
 
 
 
@@ -125,15 +126,31 @@ out: public class Main {
          else
              x;
      }
+     cond_repeat("yes", name());
+     cond_repeat("no", "Jane");
 
-public static String name(x) {
-                  return "John";
-              }
          if (c prefix "yes")
              if("yes" prefix "c")
-                 repeat(x)
+                 repeat(x);
              else
-                 x
+                 x;
          else
              x;
 
+    if ("Java" prefix langName)
+        if(langName prefix "Java")
+            "Static";
+        else
+            if("script" suffix langName)
+                "Dynamic";
+            else
+                "Unknown";
+    else
+        if ("script" suffix langName)
+            "Probably Dynamic";
+        else
+            "Unknown";
+
+    findLangType("Java");
+    findLangType("Javascript");
+    findLangType("Typescript");
