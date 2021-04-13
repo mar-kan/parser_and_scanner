@@ -52,8 +52,8 @@ start_prog ::= funct_list:f main_prog:main   {:
              ;
 
 //for declaration of functions only
-funct_list ::= /*funct_list:rest funct_decl:d  {: RESULT = String.format("%s\n\t%s\n", rest, d);   :}
-              |*/                              {: RESULT = "";                                     :}
+funct_list ::= funct_list:rest funct_decl:d  {: RESULT = String.format("%s\n\t%s\n", rest, d);   :}
+              |                              {: RESULT = "";                                     :}
              ;
 
 //main function
@@ -96,7 +96,7 @@ argu_list  ::= plain_expr:pe                 {: RESULT = String.format("%s", pe)
               |                              {: RESULT = "";                                     :} //none
              ;
 
-plain_expr ::= ID:id                        {: RESULT = String.format("%s", id);                :}
+plain_expr ::= ID:id                         {: RESULT = String.format("%s", id);                :}
               | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s);             :}
               | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
 

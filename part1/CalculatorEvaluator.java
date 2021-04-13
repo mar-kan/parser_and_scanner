@@ -5,14 +5,14 @@ import java.util.List;
 
 class CalculatorEvaluator {
 
-    private int lookaheadToken;
-    private InputStream in;
+    private int lookahead;
+    private final InputStream in;
     List<Integer> remaining;    // stores nums that weren't calculated during ** (term2)
 
     public CalculatorEvaluator(InputStream in) throws IOException
     {
         this.in = in;
-        this.lookaheadToken = in.read();
+        this.lookahead = in.read();
         this.remaining = new ArrayList<>();
     }
 
@@ -20,11 +20,13 @@ class CalculatorEvaluator {
 
     private void consume(int symbol) throws IOException, ParseError
     {
-        if (lookaheadToken != symbol)
+        if (lookahead != symbol)
             throw new ParseError("consume");
 
-        lookaheadToken = in.read();
+        lookahead = in.read();
     }
+
+    private boolean isDigit(int c) { return '0'<=c && c<= '9';}
 
     private int evalDigit(int digit) {  return digit - '0';  }
 
@@ -66,7 +68,7 @@ class CalculatorEvaluator {
     
     private int exp2(int num) throws IOException, ParseError
     {
-        if (lookaheadToken != '+' && lookaheadToken != '-')
+        if (lookahead != '+' && lookahead != '-')
             return num;
 
         int sign = op();
@@ -86,7 +88,7 @@ class CalculatorEvaluator {
 
     private int term2(int num) throws IOException, ParseError
     {
-        if (lookaheadToken != '*')  //when done with ** calculates every calculation that was ignored
+        if (lookahead != '*')  //when done with ** calculates every calculation that was ignored
         {
             while (!remaining.isEmpty())
             {
@@ -100,7 +102,7 @@ class CalculatorEvaluator {
         int sign = op();
         int num2 = factor(num, sign);
 
-        if (lookaheadToken == '*') //if there is another ** ahead doesnt calculate result now
+        if (lookahead == '*') //if there is another ** ahead doesnt calculate result now
         {
             remaining.add(num);   //pushes num that wasn't calculated
             return term2(num2);
@@ -111,17 +113,17 @@ class CalculatorEvaluator {
     private int factor(int num, int sign) throws IOException, ParseError
     {   
         int num2;
-        if (lookaheadToken >= '0' && lookaheadToken <= '9')
+        if (lookahead >= '0' && lookahead <= '9')
             num2 = num();
         else
         {
-            if (lookaheadToken != '(')
+            if (lookahead != '(')
                 throw new ParseError("factor");
             
             consume('(');
             num2 = expr();
 
-            if (lookaheadToken != ')')
+            if (lookahead != ')')
                 throw new ParseError("factor");
             consume(')');
         }
@@ -133,15 +135,15 @@ class CalculatorEvaluator {
     
     private int op() throws IOException, ParseError 
     {
-        if (lookaheadToken != '+' && lookaheadToken != '-' && lookaheadToken != '*')
+        if (lookahead != '+' && lookahead != '-' && lookahead != '*')
             throw new ParseError("op");
         
-        int sign = lookaheadToken;
+        int sign = lookahead;
         consume(sign);
         
         if (sign == '*') //needs 2nd *
         {
-            if (lookaheadToken != '*')
+            if (lookahead != '*')
                 throw new ParseError("op");
             
             consume('*');
@@ -156,12 +158,12 @@ class CalculatorEvaluator {
     }
     
     private int moreDigits(int num) throws IOException, ParseError {
-        if (lookaheadToken < '0' || lookaheadToken > '9')
+        if (!isDigit(lookahead))
             return num;
 
         num = num*10 + digit();  //builds int
 
-        if (lookaheadToken < '0' || lookaheadToken > '9')
+        if (!isDigit(lookahead))
             return num;
         else
             return moreDigits(num);
@@ -169,10 +171,10 @@ class CalculatorEvaluator {
     
     private int digit() throws IOException, ParseError
     {
-        if (lookaheadToken < '0' || lookaheadToken > '9')
+        if (!isDigit(lookahead))
             throw new ParseError("digit");
 
-        int num = lookaheadToken;
+        int num = lookahead;
         consume(num);
 
         return evalDigit(num);  //returns its int value
@@ -181,10 +183,10 @@ class CalculatorEvaluator {
     //1st digit of int. to throw parse error when a num starts with 0
     private int first_digit() throws IOException, ParseError
     {
-        if (lookaheadToken <= '0' || lookaheadToken > '9')
+        if (!isDigit(lookahead) && lookahead != '0') //1st digit cannot be 0
             throw new ParseError("first_digit");
 
-        int num = lookaheadToken;
+        int num = lookahead;
         consume(num);
 
         return evalDigit(num);  //returns its int value
@@ -196,10 +198,10 @@ class CalculatorEvaluator {
     {
         int res = expr();
 
-        if (lookaheadToken != '\n' && lookaheadToken != -1)
+        if (lookahead != '\n' && lookahead != -1)
             throw new ParseError("parse");
 
-        if (lookaheadToken == -1)
+        if (lookahead == -1)
             System.out.println();
 
         return res;
