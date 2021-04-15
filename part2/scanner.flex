@@ -59,45 +59,34 @@ LineTerminator = \r|\n|\r\n
 /* White space is a line terminator, space, tab, or line feed. */
 WhiteSpace     = {LineTerminator} | [ \t\f]
 
-id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
+/* A literal integer is is a number beginning with a number between
+   one and nine followed by zero or more numbers between zero and nine
+   or just a zero.  */
 
+id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables / function names
 
-
-%state STRING, DECLARE_FUNCT, CALL_FUNCT, FUNCTION
+%state STRING
 
 %%
 /* ------------------------Lexical Rules Section---------------------- */
 
 <YYINITIAL> {
 /* operators */
- "+"            { return symbol(sym.CONCAT); } //changed PLUS to CONCAT
  "("            { return symbol(sym.LPAREN); }
  ")"            { return symbol(sym.RPAREN); }
- ";"            { return symbol(sym.SEMI); }
  \"             { stringBuffer.setLength(0); yybegin(STRING); }
  {WhiteSpace}   { /* just skip what was found, do nothing */ }
 
-  /** added operators**/
+ "+"            { return symbol(sym.CONCAT);   } //changed PLUS to CONCAT
  "prefix"       { return symbol(sym.PREFIX);   }
  "suffix"       { return symbol(sym.SUFFIX);   }
  "if"           { return symbol(sym.IF);       }
  "else"         { return symbol(sym.ELSE);     }
-  "{"           { return symbol(sym.LBRACKET); }
-  "}"           { return symbol(sym.RBRACKET); }
-  "return"      { return symbol(sym.RETURN);   }
-  ","           { return symbol(sym.COMMA);    }
-
- //for function calls
- //{id}"("        { stringBuffer.setLength(0); yybegin(CALL_FUNCT); }
-
- //for variables. returns their name
+ "{"            { return symbol(sym.LBRACKET); }
+ "}"            { return symbol(sym.RBRACKET); }
+ ","            { return symbol(sym.COMMA);    }
  {id} 		    { return symbol(sym.ID, new String(yytext())); }
-
- //{id}"("        { return symbol(sym.ID, new String(yytext())); }
- /****/
 }
-
-
 
 <STRING> {
       \"                             { yybegin(YYINITIAL);
@@ -109,14 +98,6 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables
       \\\"                           { stringBuffer.append('\"'); }
       \\                             { stringBuffer.append('\\'); }
 }
-
-
-<DECLARE_FUNCT> {
-    \)                               { yybegin(YYINITIAL);
-                                           return symbol(sym.ID, stringBuffer.toString()); }
-    [^\n\0\r\"\\\(]+                 { stringBuffer.append( yytext() ); }
-}
-
 
 /* No token was found for the input so throw an error.  Print out an
    Illegal character message with the illegal character that was found. */
