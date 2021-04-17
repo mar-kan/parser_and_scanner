@@ -5,10 +5,11 @@ Compilers - Project 1
 Part 1
 
 I edited the grammar to become LL(1) and separated ** operation from +- (term2 and exp2) to achieve different 
-functionality. +- are prioritized from the left to the right and is always calculated at that time, while ** is 
-calculated from the right to the left, only if there is another ** next. I achieved the right to left priority by adding
+functionality and priority. +- are prioritized from the left to the right and is always calculated at that time, while ** 
+is calculated from the right to the left, only if there is another ** next. I achieved the right to left priority by adding
 a list in the class which stores all numbers that aren't calculated immediately. Everything in this list is calculated
-when there are no more ** next.
+when there are no more ** next. I also seperated number in many rules, to forbid the usage of <0> as the first digit and
+keep the LL(1) property at the same time.
 
 
 Compilation instructions:
@@ -41,7 +42,9 @@ op -> +
     | -
     | **
 
-num -> first_digit moreDigits
+start_num -> first_digit moreDigits
+
+num -> moreDigits
 
 moreDigits -> num
             | ε
