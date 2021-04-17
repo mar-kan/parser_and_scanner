@@ -35,7 +35,7 @@ term -> factor term2
 term2 -> ** factor term2
         | ε
 
-factor -> num 
+factor -> start_num 
         | (expr)
 
 op -> +
@@ -43,6 +43,7 @@ op -> +
     | **
 
 start_num -> first_digit moreDigits
+            | 0
 
 num -> moreDigits
 
