@@ -43,6 +43,7 @@ op -> +
     | **
 
 start_num -> first_digit moreDigits
+            | 0
 
 num -> moreDigits
 
