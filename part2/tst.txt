@@ -1,10 +1,10 @@
+/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
 /**
  *  Package and Import Specifications
  */
 import java_cup.runtime.*;
 import java.io.FileWriter;
 import java.io.IOException;
-
 
 /**
  *  Usercode Components
@@ -14,18 +14,17 @@ parser code {:
     Scanner s;
     Parser(Scanner s){ this.s=s; }
 
-    void print(String s) //prints a string
-    {
-        System.out.println(s);
-    }
+        void print(String s) //prints a string
+        {
+            System.out.println(s);
+        }
 
-    void produceOutputFile(String s, String fname) throws IOException
-    //prints s in a new file named fname
-    {
-        FileWriter writer = new FileWriter(fname);
-        writer.write(s);
-        writer.close();
-    }
+        void produceOutputFile(String s, String fname) throws IOException //prints s in a new file named fname
+        {
+            FileWriter writer = new FileWriter(fname);
+            writer.write(s);
+            writer.close();
+        }
 :}
 
 /* define how to connect to the scanner! */
@@ -36,84 +35,79 @@ scan with {: return s.next_token(); :};
  */
 
 /* Terminals (tokens returned by the scanner). */
-terminal            ENTER, CONCAT, PREFIX, SUFFIX, IF, ELSE, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA;
+terminal            CONCAT, PREFIX, SUFFIX, LPAREN, RPAREN, IF, ELSE, COMMA, LBRACKET, RBRACKET;
 terminal String     STRING_LITERAL, ID;
 
 /*  Non terminals */
-non terminal            start_prog;
-non terminal String     expr, plain_expr, expr_list, logic_expr, if_expr, funct_decl, argument, main_prog;
-non terminal String     argu_list, funct_call, func_expr_list, components, decl_argu_list;      // used to store evaluated subexpressions
+non terminal           start_prog;
+non terminal String    components, main_prog, expr, expr_list, if_expr, logic_expr, funct_decl, funct_call, argu_list;
+non terminal String    decl_argu_list, func_expr_list, funct_expr, function, argument;      // used to store evaluated subexpressions
+
 
 /**
  *  Precedence Declarations
  */
 
-precedence left LPAREN;
-precedence left CONCAT, PREFIX, SUFFIX;
-precedence left IF;
-precedence left ID;
+precedence right RPAREN;
+precedence right COMMA;
+precedence right ID;
+precedence right IF, SUFFIX, PREFIX;
+precedence left CONCAT;
 
 
 /**
  *  The Grammar Rules
  */
 
-//program starts with declaration of functions and then the main function from the user, but prints them backwards
-start_prog ::= components:c   {:
-                  print(String.format("\n\npublic class Main {\n%s\n}", c));
-                  produceOutputFile(String.format("public class Main {\n\t%s\n}", c), "Main.java");
-                  :}
-             ;
+start_prog ::= components:c {:
+            String result = String.format("public class Main {\n%s\n}", c);
+            // writes result in standard output and in new file named Main.java
+            print('\n'+result);
+            produceOutputFile(result, "Main.java");
+:}
+    ;
 
-components ::= funct_decl:f components:rest  {: RESULT = String.format("\t%s\n\t%s", f, rest);   :}
-              | main_prog:main               {: RESULT = String.format("\t%s", main);            :}
-             ;
+components ::= function:f components:more{: RESULT = String.format("%s\n%s", more, f); :}
+            | main_prog:m                   {: RESULT = m; :}
+	;
 
-main_prog  ::= expr:e main_prog:m {:
-			    RESULT = String.format("public static void main(String[] args) {\n%s\t}\n", e);
-			    :}
-			   | expr:e {:RESULT = (String.format("%s",e);:}
-	         ;
+main_prog ::= expr:e expr_list:el {: RESULT = String.format("\tpublic static void main(String[] args) {\n%s\n%s\n\t}", e, el); :}
+	;
 
-expr_list  ::= expr_list:rest expr:e         {: RESULT = String.format("%s\t\tSystem.out.println(%s);\n", rest, e);  :}
-              |                              {: RESULT = "";                                     :}
-             ;
+expr_list ::= expr_list:rest expr:e         {: RESULT = String.format("%s\t\tSystem.out.println(%s);\n", rest, e); :}
+            |                               {: RESULT = "";                                                        :}
+            ;
 
-expr       ::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2);       :}
-              | expr:e1 PREFIX expr:e2       {: RESULT = String.format("%s.prefixOf(%s)", e1, e2);  :}
-              | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.suffixOf(%s)", e1, e2);  :}
-              | if_expr:ie                   {: RESULT = String.format("%s", ie);                :}
-              | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e);               :}
-              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
-              | ID:id                        {: RESULT = String.format("%s", id);                :}
-              | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s);             :}
-             ;
-
-logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("%s.startsWith(%s)", e1, e2); :}
-              | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.endsWith(%s)", e1, e2); :}
+expr      ::= expr:e1 CONCAT  expr:e2       {: RESULT = String.format("%s + %s", e1, e2); :}
+             | expr:e1 PREFIX expr:e2       {: RESULT = String.format("%s.startsWith(%s)", e1, e2);  :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.endsWith(%s)", e1, e2);  :}
+             | LPAREN expr:e RPAREN         {: RESULT = String.format("(%s)", e); :}
+             | if_expr:ie                   {: RESULT = String.format("%s", ie);                :}
+             | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s); :}
+             | funct_call:fc                {: RESULT = fc;                :}
              ;
 
 if_expr    ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
-                    {: RESULT = String.format("%s ? %s : %s", le, e1, e2);:}
+                    {: RESULT = String.format("(%s ? %s : %s)", le, e1, e2); :} // added redundant parenthesis so that the output is readable
              ;
 
-funct_decl ::= ID:id LPAREN decl_argu_list:args RPAREN LBRACKET func_expr_list:e RBRACKET    {:
-                RESULT = String.format("public static String %s(%s) {\n %s\t}", id, args, e);
+function ::= ID:id LPAREN funct_decl:fdc {: RESULT = id+"("+fdc; :}
+             |  ID:id LPAREN funct_call:fc main_prog:m{: RESULT = id+"("+fc+'\n'+m; :}
+            ;
+
+funct_decl ::= /*ID:id LPAREN*/ decl_argu_list:args RPAREN LBRACKET func_expr_list:e RBRACKET    {:
+                RESULT = String.format("public static String "+ /*%s(*/ "%s) {\n %s\t}", id, args, e);
                 :}
              ;
 
-funct_call ::= ID:id LPAREN argu_list:args RPAREN    {:
-                RESULT = String.format("%s(%s)", id, args);
+funct_call ::= /**ID:id LPAREN*/ argu_list:args RPAREN    {:
+                RESULT = String.format(/*"%s(*/"%s)", id, args);
                 :}
-             ;
-
-func_expr_list ::= expr_list:rest expr:e {: RESULT = String.format("%s\t\treturn %s;\n", rest, e);  :}
-              |                              {: RESULT = "";                                     :}
              ;
 
 //arguments for calls. can be any expr
-argu_list  ::= expr:e                        {: RESULT = String.format("%s", e);                 :} //single
-              | argu_list:rest COMMA expr:e  {: RESULT = String.format("%s, %s", rest, e);    :} //multiple
+argu_list  ::= argu_list:rest COMMA expr:e  {: RESULT = String.format("%s, %s", rest, e);       :} //multiple
+              |  expr:e                        {: RESULT = String.format("%s", e);                 :} //single
               |                              {: RESULT = "";                                     :} //none
              ;
 
@@ -123,17 +117,23 @@ decl_argu_list ::= ID:id                     {: RESULT = String.format("%s", id)
               |                              {: RESULT = "";                                     :} //none
              ;
 
-//arguments for calls. can include ids, strings, other calls or +
-argument ::= ID:id                           {: RESULT = String.format("%s", id);                :}
-              | STRING_LITERAL:s             {: RESULT = String.format("\"%s\"", s);             :}
-              | funct_call:fc                {: RESULT = String.format("%s", fc);                :}
-              | expr:e1 CONCAT  expr:e2      {: RESULT = String.format("%s + %s", e1, e2);       :}
+//expressions for function declarations
+func_expr_list ::= func_expr_list:rest funct_expr:e {: RESULT = String.format("%s\t\treturn %s;\n", rest, e);  :}
+              | funct_expr:single                   {: RESULT = single; :} //function declaration must include at least 1 expr
+             ;
+
+funct_expr ::= expr:e   {: RESULT = e; :}
+                            | ID:id                        {: RESULT = id; :}
+                            ;
+
+logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("%s.startsWith(%s)", e1, e2); :}
+              | expr:e1 SUFFIX expr:e2       {: RESULT = String.format("%s.endsWith(%s)", e1, e2);   :}
              ;
 
 /**
-op         ::= CONCAT
-
-logical_op ::= PREFIX
+logic_op ::= PREFIX
               | SUFFIX
+             ;
 
-             */
+op         ::= CONCAT;
+             **/

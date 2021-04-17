@@ -16,7 +16,7 @@ class CalculatorEvaluator {
         this.remaining = new ArrayList<>();
     }
 
-    /** utilites functions **/
+    /** utilities functions **/
 
     private void consume(int symbol) throws IOException, ParseError
     {
@@ -30,14 +30,14 @@ class CalculatorEvaluator {
 
     private int evalDigit(int digit) {  return digit - '0';  }
 
-    public int calculateResult(int num, int num2, int sign) throws IOException, ParseError         //calculates a numerical expression and returns its result
+    public int calculateResult(int num1, int num2, int sign) throws ParseError         //calculates a numerical expression and returns its result
     {
         if (sign == '+')
-            return num + num2;
+            return num1 + num2;
         else if (sign == '-')
-            return num - num2;
+            return num1 - num2;
         else if (sign == '*')
-            return pow(num, num2);
+            return pow(num1, num2);
         else
             throw new ParseError("calculateResult");
     }
@@ -62,59 +62,58 @@ class CalculatorEvaluator {
     
     private int expr() throws IOException, ParseError
     {
-        int rv = term(-1, -1);
-        return exp2(rv);
+        return exp2(term(-1, -1));
     }
     
-    private int exp2(int num) throws IOException, ParseError
+    private int exp2(int num1) throws IOException, ParseError
     {
         if (lookahead != '+' && lookahead != '-')
-            return num;
+            return num1;
 
         int sign = op();
-        int num2 = term(num, sign);
+        int num2 = term(num1, sign);
 
-        return exp2(calculateResult(num,num2,sign));
+        return exp2(calculateResult(num1,num2,sign));
     }
 
-    private int term(int num, int sign) throws IOException, ParseError
+    private int term(int num1, int sign) throws IOException, ParseError
     {
-        int num2 = factor(num, sign);
+        int num2 = factor(num1, sign);
 
-        if (num >= '0' && num <= '9')
-            return term2(calculateResult(num, num2, sign));
+        if (num1 >= '0' && num1 <= '9')
+            return term2(calculateResult(num1, num2, sign));
         return  term2(num2);
     }
 
-    private int term2(int num) throws IOException, ParseError
+    private int term2(int num1) throws IOException, ParseError
     {
         if (lookahead != '*')  //when done with ** calculates every calculation that was ignored
         {
             while (!remaining.isEmpty())
             {
-                int num1 = remaining.get(remaining.size()-1);
+                int num2 = remaining.get(remaining.size()-1);
                 remaining.remove(remaining.size()-1);
-                num = calculateResult(num1, num, '*');
+                num1 = calculateResult(num2, num1, '*');
             }
-            return num;
+            return num1;
         }
 
         int sign = op();
-        int num2 = factor(num, sign);
+        int num2 = factor(num1, sign);
 
         if (lookahead == '*') //if there is another ** ahead doesnt calculate result now
         {
-            remaining.add(num);   //pushes num that wasn't calculated
+            remaining.add(num1);   //pushes num that wasn't calculated
             return term2(num2);
         }
-        return term2(calculateResult(num, num2, sign));
+        return term2(calculateResult(num1, num2, sign));
     }
     
-    private int factor(int num, int sign) throws IOException, ParseError
+    private int factor(int num1, int sign) throws IOException, ParseError
     {   
         int num2;
         if (lookahead >= '0' && lookahead <= '9')
-            num2 = num();
+            num2 = start_num();
         else
         {
             if (lookahead != '(')
@@ -128,8 +127,8 @@ class CalculatorEvaluator {
             consume(')');
         }
 
-        if (num >= '0' && num <= '9')
-            return calculateResult(num, num2, sign);
+        if (num1 >= '0' && num1 <= '9')
+            return calculateResult(num1, num2, sign);
         return num2;
     }
     
@@ -150,22 +149,30 @@ class CalculatorEvaluator {
         }
         return sign;
     }
-    
-    private int num() throws IOException, ParseError
+
+    private int start_num() throws IOException, ParseError
     {
-        return moreDigits(first_digit());
+        int digit1 = first_digit();
+        if (digit1 == 0)
+            return 0;
+        return moreDigits(digit1);
+    }
+
+    private int num(int number) throws IOException, ParseError
+    {
+        return moreDigits(number);
     }
     
-    private int moreDigits(int num) throws IOException, ParseError {
+    private int moreDigits(int number) throws IOException, ParseError {
         if (!isDigit(lookahead))
-            return num;
+            return number;
 
-        num = num*10 + digit();  //builds int
+        number = number*10 + digit();  //builds int
 
         if (!isDigit(lookahead))
-            return num;
+            return number;
         else
-            return moreDigits(num);
+            return num(number);
     }
     
     private int digit() throws IOException, ParseError
@@ -173,22 +180,22 @@ class CalculatorEvaluator {
         if (!isDigit(lookahead))
             throw new ParseError("digit");
 
-        int num = lookahead;
-        consume(num);
+        int number = lookahead;
+        consume(number);
 
-        return evalDigit(num);  //returns its int value
+        return evalDigit(number);  //returns its int value
     }
 
-    //1st digit of int. to throw parse error when a num starts with 0
+    //1st digit of num. to throw parse error when a num starts with 0
     private int first_digit() throws IOException, ParseError
     {
-        if (!isDigit(lookahead) && lookahead != '0') //1st digit cannot be 0
+        if (!isDigit(lookahead))
             throw new ParseError("first_digit");
 
-        int num = lookahead;
-        consume(num);
+        int number = lookahead;
+        consume(number);
 
-        return evalDigit(num);  //returns its int value
+        return evalDigit(number);  //returns its int value
     }
     
 
