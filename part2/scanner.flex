@@ -77,6 +77,7 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables / function names
  \"             { stringBuffer.setLength(0); yybegin(STRING); }
  {WhiteSpace}   { /* just skip what was found, do nothing */ }
 
+/*************** new rules ***************/
  "+"            { return symbol(sym.CONCAT);   } //changed PLUS to CONCAT
  "prefix"       { return symbol(sym.PREFIX);   }
  "suffix"       { return symbol(sym.SUFFIX);   }
@@ -85,12 +86,13 @@ id = [a-zA-Z_][a-zA-Z0-9_]* //added id for variables / function names
  "{"            { return symbol(sym.LBRACKET); }
  "}"            { return symbol(sym.RBRACKET); }
  ","            { return symbol(sym.COMMA);    }
- "){"           { return symbol(sym.PARBRACK); }
- ") {"          { return symbol(sym.PARBRACK); }
- ")  {"         { return symbol(sym.PARBRACK); }
- ")   {"        { return symbol(sym.PARBRACK); }
- ")    {"       { return symbol(sym.PARBRACK); }
- {id} 		    { return symbol(sym.ID, new String(yytext())); }
+
+/***** multi character rules (ignoring whitespaces) *****/
+ "("+{WhiteSpace}*+")"  { return symbol(sym.PAREN);    }
+ //")"+{WhiteSpace}*+"{"  { return symbol(sym.PARBRACK); }
+
+/***** id *****/
+ {id} 	{ return symbol(sym.ID, new String(yytext())); }
 }
 
 <STRING> {
