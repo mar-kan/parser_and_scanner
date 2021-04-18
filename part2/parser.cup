@@ -37,7 +37,7 @@ scan with {: return s.next_token(); :};
  */
 
 /* Terminals (tokens returned by the scanner). */
-terminal            CONCAT, PREFIX, SUFFIX, LPAREN, RPAREN, IF, ELSE, COMMA, LBRACKET, RBRACKET, PARBRACK, PAREN;
+terminal            CONCAT, PREFIX, SUFFIX, LPAREN, RPAREN, IF, ELSE, COMMA, LBRACKET, RBRACKET, PAREN;
 terminal String     STRING_LITERAL, ID;
 
 /*  Non terminals */
@@ -49,7 +49,7 @@ non terminal String    decl_argu_list, func_expr_list, funct_expr, id_expr, rest
 /**
  *  Precedence Declarations
  */
-precedence right IF, SUFFIX, PREFIX;
+precedence left IF, SUFFIX, PREFIX;
 precedence left CONCAT;
 
 
@@ -101,14 +101,18 @@ expr      ::= expr:e1 CONCAT  expr:e2         {: RESULT = String.format("%s + %s
 
 /**************** if expressions ****************/
 
-if_expr   ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2
+if_expr   ::= IF LPAREN logic_expr:le RPAREN expr:e1 ELSE expr:e2 // w logical expression
         {:
             RESULT = String.format("(%s ? %s : %s)", le, e1, e2); // added parenthesis so that the output is readable
         :}
+        | IF LPAREN if_expr:ie RPAREN expr:e1 ELSE expr:e2        // w 2nd if
+        {:
+            RESULT = String.format("(%s ? %s : %s)", ie, e1, e2);
+        :}
     ;
 
-logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("%s.startsWith(%s)", e1, e2);                 :}
-             | expr:e1 SUFFIX expr:e2        {: RESULT = String.format("%s.endsWith(%s)", e1, e2);                   :}
+logic_expr ::= expr:e1 PREFIX expr:e2        {: RESULT = String.format("(%s).startsWith(%s)", e1, e2);                 :} //added parenthesis bc its needed sometimes for the correct output
+             | expr:e1 SUFFIX expr:e2        {: RESULT = String.format("(%s).endsWith(%s)", e1, e2);                   :}
     ;
 
 
@@ -196,12 +200,18 @@ all_expr_list ::= funct_expr:e COMMA all_expr_list:rest
 
 /**************** if expressions for declarations ****************/
 
-if_expr_func ::= IF LPAREN logic_expr_func:le RPAREN funct_expr:e1 ELSE funct_expr:e2
-        {: RESULT = String.format("(%s ? %s : %s)", le, e1, e2); :} // added parenthesis so that the output is readable
+if_expr_func ::= IF LPAREN logic_expr_func:le RPAREN funct_expr:e1 ELSE funct_expr:e2   // w logical expression
+        {:
+            RESULT = String.format("(%s ? %s : %s)", le, e1, e2);    // added parenthesis so that the output is readable
+        :}
+        | IF LPAREN if_expr_func:ie RPAREN funct_expr:e1 ELSE funct_expr:e2             // w 2nd if
+        {:
+            RESULT = String.format("(%s ? %s : %s)", ie, e1, e2);
+        :}
     ;
 
-logic_expr_func ::= funct_expr:e1 PREFIX funct_expr:e2  {: RESULT = String.format("%s.startsWith(%s)", e1, e2);      :}
-              | funct_expr:e1 SUFFIX funct_expr:e2      {: RESULT = String.format("%s.endsWith(%s)", e1, e2);        :}
+logic_expr_func ::= funct_expr:e1 PREFIX funct_expr:e2  {: RESULT = String.format("(%s).startsWith(%s)", e1, e2);      :}   //added parenthesis bc its needed sometimes for the correct output
+              | funct_expr:e1 SUFFIX funct_expr:e2      {: RESULT = String.format("(%s).endsWith(%s)", e1, e2);        :}
     ;
 
 

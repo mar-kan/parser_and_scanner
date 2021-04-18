@@ -70,7 +70,7 @@ To cleanup generated files:
 $ make clean
 
 
-!! To run the program again you may need to 'clean' the output files, because of the <Main.java> program generation. 
+!!! To run the program again you may need to clean the output files, because of the <Main.java> program generation. 
 
 
 
@@ -80,7 +80,7 @@ A function declaration and the main program need to have at least one argument t
 
 Function and main expressions are separated, so that variables <ID> are valid only in the functions.
         
-An if expression can only include a logical expression <PREFIX, SUFFIX> however complicated.
+An if expression can only include a logical expression <PREFIX, SUFFIX> or a second if expression, however complicated.
 
 Declarations of functions must precede the main program.
 
