@@ -66,4 +66,14 @@ $ make execute
 To cleanup generated files:
 $ make clean
 
+!! To run the program again you may need to 'clean' the output files, because of the <Main.java> program generation. 
 
+
+The program receives the input and outputs the java program both in the standard output and in a file named Main.java.
+A function declaration and the main program need to have at least one argument to be valid.
+Function and main expressions are separated, so that variables <ID> are valid only in the functions.
+An if expression can only include a logical expression <PREFIX, SUFFIX> however complicated.
+Declarations of functions must precede the main program.
+In function declarations the arguments must be <ID>s.
+In function calls the arguments can be any expression but <ID>s.         
+        
