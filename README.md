@@ -1,17 +1,7 @@
-Kanellaki Maria-Anna - 1115201400060
-
-Compilers - Project 1
-
-
 
 Part 1
 
-I edited the grammar to become LL(1) and separated ** operation from +- (term2 and exp2) to achieve different 
-functionality and priority. +- are prioritized from the left to the right and is always calculated at that time, while ** 
-is calculated from the right to the left, only if there is another ** next. I achieved the right to left priority by adding
-a list in the class which stores all numbers that aren't calculated immediately. Everything in this list is calculated
-when there are no more ** next. I also seperated number in many rules, to forbid the usage of <0> as the first digit and
-keep the LL(1) property at the same time.
+Simple Parser Calculator that supports addition, subtraction, exponentation and parenthesis with an LL(1) Grammar.
 
 
 Compilation instructions:
@@ -70,7 +60,11 @@ To cleanup generated files:
 $ make clean
 
 
-!!! To run the program again you may need to clean the output files, because of the <Main.java> program generation. 
+Parser and translator for a simple language supporting string operations.
+
+The language supports the concatenation (+) operator over strings, function definitions and calls, conditionals (if-else, every "if" must be followed by an "else"), and the logical expressions:
+    is-prefix-of (string1 prefix string2): Whether string1 is a prefix of string2.
+    is-suffix-of (string1 suffix string2): Whether string1 is a suffix of string2.
 
 
 
