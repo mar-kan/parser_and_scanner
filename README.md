@@ -20,35 +20,35 @@ $ make clean
 
 Grammar:
 
-expr -> term expr2
+        expr -> term expr2
 
-expr2 -> + term expr2
+        expr2 -> + term expr2
         | - term expr2
         | ε
 
-term -> factor term2
+        term -> factor term2
 
-term2 -> ** factor term2
+        term2 -> ** factor term2
         | ε
 
-factor -> start_num 
+        factor -> start_num 
         | (expr)
 
-op -> +
-    | -
-    | **
+        op -> +
+        | -
+        | **
 
-start_num -> first_digit moreDigits
+        start_num -> first_digit moreDigits
             | 0
 
-num -> moreDigits
+        num -> moreDigits
 
-moreDigits -> num
+        moreDigits -> num
             | ε
 
-digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+        digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
-first_digit -> 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+        first_digit -> 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 -------------------------------------------------------
 
